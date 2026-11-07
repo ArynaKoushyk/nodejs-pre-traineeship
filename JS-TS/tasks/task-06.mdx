@@ -16,7 +16,7 @@ Create an asynchronous wrapper that pretends to call a remote REST API. You will
    - `remove(id: number): Promise<void>`  
 2. Each method must simulate network latency of **300-600 ms** using `setTimeout`.
 3. Create and export a custom error class `TodoNotFoundError` in
-   `solutions/todo-api.ts`. It must extend `Error`, carry the missing `id`, and
+   `solutions/todo-api.ts`. It must extend `Error`,this.name = 'TodoNotFoundError', and
    set `this.name = 'TodoNotFoundError'`. Throw it from `update(id, ...)` and
    `remove(id)` when no todo with that `id` exists; `getAll()` and `add()` never
    throw it.
