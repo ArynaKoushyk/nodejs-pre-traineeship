@@ -1,3 +1,4 @@
+import { InMemoryRepository } from "./repository";
 import { createTodo } from "./todo-factory";
 import { Todo, NewTodo } from "./types";
 
@@ -10,56 +11,51 @@ export class TodoNotFoundError extends Error {
   }
 }
 
-const ms = Math.floor(Math.random() * 301) + 300;
+async function delay(): Promise<void> {
+  const ms = Math.floor(Math.random() * 301) + 300;
+
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 export class TodoApi {
   // Task 6 stores todos in a plain array; Task 7 replaces it with InMemoryRepository
-  private todos: Todo[] = [];
+  constructor(private readonly repo = new InMemoryRepository<Todo>()) {}
 
   async getAll(): Promise<Todo[]> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-    return this.todos;
+    await delay();
+    return this.repo.findAll();
   }
 
   async add(newTodo: NewTodo): Promise<Todo> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
+    await delay();
     const todo = createTodo(newTodo);
-    this.todos.push(todo);
-    return todo;
+    return this.repo.add(todo);
   }
 
   async update(
     id: number,
     update: Partial<Omit<Todo, "id" | "createdAt">>,
   ): Promise<Todo> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-    const todo = this.todos.find((todo) => todo.id === id);
+    await delay();
+
+    const todo = this.repo.findById(id);
+
     if (!todo) {
       throw new TodoNotFoundError(id);
     }
-    const updatedTodo = { ...todo, ...update };
-    this.todos = this.todos.map((todo) =>
-      todo.id === id ? updatedTodo : todo,
-    );
 
-    return updatedTodo;
+    return this.repo.update(id, update);
   }
 
   async remove(id: number): Promise<void> {
-    await new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
+    await delay();
 
-    const todo = this.todos.find((todo) => todo.id === id);
+    const todo = this.repo.findById(id);
+
     if (!todo) {
       throw new TodoNotFoundError(id);
     }
-
-    this.todos = this.todos.filter((todo) => todo.id !== id);
+    this.repo.remove(id);
   }
 }
